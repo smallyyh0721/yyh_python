@@ -28,7 +28,9 @@ def dowmloadPic(html, keyword,count):
         i += 1
         count=count-1
         if(count==0):
+            fp.close()
             break
+            
             #exit(1)
 
 
@@ -38,6 +40,6 @@ if __name__ == '__main__':
  #   url = 'http://image.baidu.com/search/flip?tn=baiduimage&ie=utf-8&word=' + word + '&ct=201326592&v=flip'
     url = 'http://image.baidu.com/search/index?tn=baiduimage&ipn=r&ct=201326592&cl=2&lm=-1&st=-1&sf=1&fmq=&pv=&ic=0&nc=1&z=&se=1&showtab=0&fb=0&width=&height=&face=0&istype=2&ie=utf-8&fm=index&pos=history&word='+word
     print(url)
-    result = requests.get(url)
+    result = requests.get(url,timeout=10)
     print(result)
     dowmloadPic(result.text, word,countpic)
