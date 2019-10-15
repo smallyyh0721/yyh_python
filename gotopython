@@ -1,0 +1,11 @@
+Beautiful soup
+from bs4 import BeautifulSoup
+soup = BeautifulSoup(html, features='lxml')
+
+# use class to narrow search
+month = soup.find_all('li', {"class": "month"})
+
+jan = soup.find('ul', {"class": 'jan'})
+d_jan = jan.find_all('li')              # use jan as a parent
+for d in d_jan:
+    print(d.get_text())
