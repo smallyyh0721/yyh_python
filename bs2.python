@@ -1,0 +1,28 @@
+
+
+import bs4,requests
+import re
+from bs4 import BeautifulSoup
+
+ht=requests.get('https://www.baidu.com')
+print(ht)
+bs1 = BeautifulSoup(ht.content,"lxml")
+#print(bs1)
+#res=bs1.find(text=re.compile('网络流行语'))
+
+res = bs1.find_all('')
+                   
+print("allI find",res)
+
+'''
+res=bs1.find(text=re.compile(('网络流行语')))
+
+print('res type:',type(res))
+
+for one in res.parent.parent.next_siblings:
+    print(one)
+    
+for one in res.parent.oarent.previous_siblings:
+    print(one)
+    
+    '''
