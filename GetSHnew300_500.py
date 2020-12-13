@@ -7,18 +7,22 @@ Created on Fri Dec 11 00:06:19 2020
 
 import bs4,requests
 import re
+import csv
+
+import codecs
 from bs4 import BeautifulSoup
+
 
 #Test : Get all items from page 1  Total 300 - 500
 
 Tpage = "https://sh.fang.lianjia.com/loupan/bp300ep500pg"
 LP_name = []
+CSV_headers = ["Name","Distric","Addr","Area","UnitP","TotalP"]
 
 def getLPinfo(LPlist,url):
-    #LPlist = []
-    LPtmp = []
-    LPinfo = []
-    index = 0
+
+    #DICTtmp = {"Name": "", "Distric":"" ,"Addr":"", "Area":"", "UnitP":"", "TotalP":""}
+
     ht = requests.get(url)
 
     print("Web Page Reponse Code:",ht.status_code)
@@ -27,30 +31,59 @@ def getLPinfo(LPlist,url):
     
 
     for lp in lps:
+        DICTtmp = {"Name": "", "Distric":"" ,"Addr":"", "Area":"", "UnitP":"", "TotalP":""}
         print("Found a new loupan\n")
         tmp=lp.findChild().findNextSibling()
-        infos=tmp.findChild()
-        print("loupan Name: ",infos.a.get_text())
-        infos=infos.findNextSibling()        
-        print("loupan Distric: ",infos.span.get_text())
-        print("loupan Addr: ",infos.a.get_text())
+        infos=tmp.findChild()   
+        DICTtmp["Name"] = infos.a.get_text()
+        #DICTtmp["Name"]  = '\ufeff' +"实验"
+        #print("loupan Name: ",infos.a.get_text())
+        print("loupan name is :",DICTtmp["Name"])
+        
+        infos=infos.findNextSibling()
+        DICTtmp["Distric"] = infos.span.get_text()         
+        #print("loupan Distric: ",infos.span.get_text())
+        print("loupan District",DICTtmp["Distric"])
+        DICTtmp["Addr"] = infos.a.get_text()
+        #print("loupan Addr: ",infos.a.get_text())
+        print("loupan Addr:",DICTtmp["Addr"])
         infos=infos.findNextSibling().findNextSibling()
-        print("loupan Area: ",infos.span.get_text())
+        DICTtmp["Area"] = infos.span.get_text()
+        #print("loupan Area: ",infos.span.get_text())
+        print("loupan Area: ",DICTtmp["Area"])
         infos=infos.findNextSibling().findNextSibling().findNextSibling()
-        print("loupan Single Price/m2: ",infos.div.span.get_text())
+        DICTtmp["UnitP"] = infos.div.span.get_text()
+        #print("loupan Single Price/m2: ",infos.div.span.get_text())
+        print("loupan Single Price/m2: ",DICTtmp["UnitP"])
         for tp in infos.findNext().fetchNextSiblings():
-            print("loupan total Price: ",tp.get_text())
+            DICTtmp["TotalP"] = tp.get_text()
+            #print("loupan total Price: ",tp.get_text())
+            print("loupan total Price: ",DICTtmp["TotalP"])
+        #DICTnew = DICTtmp
+        
+        LPlist.append(DICTtmp)
+        del DICTtmp
+        #print(LPlist)
+        #del DICTnew
+    
 
     return LPlist
     
 
-    
-        #print(LPinfo)
-
-    #print("The new LPinfo is :",LPinfo)
-        #print("LP info is :",LPtmp)
+def write2csv(LP,csvfile):
+    with codecs.open(csvfile,'wb','utf_8_sig')as f:
         
-    return LPtmp
+        if f.writable():
+            
+            f_csv = csv.DictWriter(f,CSV_headers)
+            f_csv.writeheader()
+            
+            f_csv.writerows(LP)
+        else:
+            print("The file is not writable, please close the open files")
+        
+    
+        
             
 class loupan:
     name=""
@@ -65,11 +98,21 @@ class loupan:
         
 
 if __name__=="__main__":
-    #LP = getLPinfo(LP_name,Tpage+'1')
-    
+    csvfile = 'test.csv'
+    """
+    LP = getLPinfo(LP_name,Tpage+'1')
+    #print(LP)
+    write2csv(LP,csvfile)
+    #print("LP is :\n",LP)
+    """
+    #把楼盘信息写入文件
     for i in range(30):
         newpage = Tpage+str(i+1)
-        print(newpage)
+        
         LP = getLPinfo(LP_name,newpage)
+        write2csv(LP,csvfile)
+    
+    #生成
     #print("Get Loupan info :\n",LP)
+    
     
