@@ -7,6 +7,7 @@ Created on Fri Dec 11 00:06:19 2020
 Next Step :
     分析楼盘的详细信息
     https://sh.fang.lianjia.com/loupan/p_jfcafsam/xiangqing/
+    获取售楼处地址 和 开发商信息
     获取开盘信息（首页） 规划信息 配套信息（详情）
     规划信息
     
