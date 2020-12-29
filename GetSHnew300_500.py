@@ -116,7 +116,18 @@ class loupan:
         self.total = t
     def getinfo(self):
         print("The info of loupan is :",self.name,self.price)
-        
+
+# Get latest kaipan date
+def getkaipan(url):
+    ht = requests.get(url)
+    bs1 = BeautifulSoup(ht.content,"lxml")
+    OpenDate = (bs1.find(attrs={"class":"open-date"})).findChild().findNextSibling() 
+    return OpenDate.get_text()
+
+# Get Configuration data
+def getconf(url):
+    ht = requests.get(url)
+    bs1 = BeautifulSoup(ht.content,"lxml")        
 
 if __name__=="__main__":
     csvfile = 'test.csv'
