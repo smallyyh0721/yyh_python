@@ -9,13 +9,16 @@ Next Step :
     https://sh.fang.lianjia.com/loupan/p_jfcafsam/xiangqing/
     获取开盘信息（首页） 规划信息 配套信息（详情）
     规划信息
-    
+    https://sh.fang.lianjia.com/loupan/bp300ep600pg
 """
 
 import bs4,requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
 import re
 import csv
-
+import time
 import codecs
 from bs4 import BeautifulSoup
 
@@ -24,16 +27,20 @@ from bs4 import BeautifulSoup
 
 page = "https://sh.fang.lianjia.com/loupan/"
 base_page ="https://sh.fang.lianjia.com"
-Tpage = "https://sh.fang.lianjia.com/loupan/bp300ep500pg"
+Tpage = "https://sh.fang.lianjia.com/loupan/bp300ep600pg"
 xq_page = "https://sh.fang.lianjia.com/loupan/p_gmssysblcwa"
 xq = "xiangqing"
 
 LP_name = []
 CSV_headers = ["Name","Distric","Addr","Area","UnitP","TotalP","Status","Opendate","MoreInfo"]
 
+#>>> header = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1',}
+
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1',}
+
 def getkaipan(url):
     #print(url)
-    ht = requests.get(url)
+    ht = requests.get(url,verify=False)
     bs1 = BeautifulSoup(ht.content,"lxml")
     OpenDate = (bs1.find(attrs={"class":"open-date"})).findChild().findNextSibling() 
     return OpenDate.get_text()
@@ -41,7 +48,7 @@ def getkaipan(url):
 def getdynsta(url):
     DynSta = ""
     try :
-        ht = requests.get(url)
+        ht = requests.get(url,verify=False)
     except :
         print("failed to connect the page")
     bs1 = BeautifulSoup(ht.content,"lxml")
@@ -58,14 +65,20 @@ def getdynsta(url):
 
 # Get loupan conf from Xiangqing page
 def getconf(url):
-    ht = requests.get(url)
+    ht = requests.get(url,verify=False)
     bs1 = BeautifulSoup(ht.content,"lxml") 
 
 def getLPinfo(LPlist,url):
 
     #DICTtmp = {"Name": "", "Distric":"" ,"Addr":"", "Area":"", "UnitP":"", "TotalP":""}
-
-    ht = requests.get(url)
+    requests.adapters.DEFAULT_RETRIES = 5
+    try :        
+        ht = requests.get(url,verify=False)
+    except :
+        print("Caught issue , retrying ")
+        time.sleep(5)
+        print("Trying.....")
+        ht = requests.get(url,verify=False)
 
     #print("Web Page Reponse Code:",ht.status_code)
     bs1 = BeautifulSoup(ht.content,"lxml")
@@ -175,13 +188,13 @@ if __name__=="__main__":
     
     """
     #把楼盘信息写入文件
-    for i in range(39):
+    for i in range(2):
         print("Processing page num :", i)
         newpage = Tpage+str(i+1)        
         LP = getLPinfo(LP_name,newpage)
-        
+        time.sleep(1)
         write2csv(LP,csvfile)
-    
+    print("End of the process")
 
     #生成
     #print("Get Loupan info :\n",LP)
